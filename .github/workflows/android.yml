@@ -3,8 +3,6 @@ name: Android CI
 on:
   push:
     branches: [ "master" ]
-  pull_request:
-    branches: [ "master" ]
 
 jobs:
   build:
@@ -25,10 +23,36 @@ jobs:
         gradle-version: 8.7
 
     - name: Build Debug APK
-      run: ./gradlew assembleDebug --no-daemon
+      id: build
+      run: |
+        ./gradlew assembleDebug --no-daemon 2>&1 | tee build.log
+        echo "build_exit_code=${PIPESTATUS[0]}" >> $GITHUB_OUTPUT
 
     - name: Upload APK
+      if: success()
       uses: actions/upload-artifact@v4
       with:
         name: app-debug
         path: app/build/outputs/apk/debug/app-debug.apk
+
+    - name: Notify Success
+      if: success()
+      env:
+        TG_TOKEN: ${{ secrets.TG_TOKEN }}
+        TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
+      run: |
+        curl -s -X POST "https://api.telegram.org/bot${TG_TOKEN}/sendMessage" \
+          -F "chat_id=${TG_CHAT_ID}" \
+          -F "text=✅ 智慧河南编译成功！%0A%0A📦 下载: https://github.com/ChangshengChen7/henan-wisdom/actions/runs/${GITHUB_RUN_ID}%0A%0A💕 红莲"
+
+    - name: Notify Failure
+      if: failure()
+      env:
+        TG_TOKEN: ${{ secrets.TG_TOKEN }}
+        TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
+      run: |
+        # 提取错误信息
+        ERRORS=$(grep -E "^e:" build.log | head -10 || echo "查看完整日志")
+        curl -s -X POST "https://api.telegram.org/bot${TG_TOKEN}/sendMessage" \
+          -F "chat_id=${TG_CHAT_ID}" \
+          -F "text=❌ 智慧河南编译失败！%0A%0A错误摘要:%0A${ERRORS}%0A%0A📂 日志: https://github.com/ChangshengChen7/henan-wisdom/actions/runs/${GITHUB_RUN_ID}%0A%0A💕 红莲"
