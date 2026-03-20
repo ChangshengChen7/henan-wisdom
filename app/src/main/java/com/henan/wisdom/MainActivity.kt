@@ -4,8 +4,6 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -31,28 +29,28 @@ class MainActivity : ComponentActivity() {
                     bottomBar = {
                         NavigationBar {
                             NavigationBarItem(
-                                icon = { Icon(Icons.Default.Home, contentDescription = "首页") },
-                                label = { Text("首页") },
                                 selected = selectedRoute == "home",
-                                onClick = { selectedRoute = "home" }
+                                onClick = { selectedRoute = "home" },
+                                icon = { Text("🏠") },
+                                label = { Text("首页") }
                             )
                             NavigationBarItem(
-                                icon = { Icon(Icons.Default.Book, contentDescription = "学习") },
-                                label = { Text("学习") },
                                 selected = selectedRoute == "study",
-                                onClick = { selectedRoute = "study" }
+                                onClick = { selectedRoute = "study" },
+                                icon = { Text("📚") },
+                                label = { Text("学习") }
                             )
                             NavigationBarItem(
-                                icon = { Icon(Icons.Default.ShowChart, contentDescription = "进度") },
-                                label = { Text("进度") },
                                 selected = selectedRoute == "progress",
-                                onClick = { selectedRoute = "progress" }
+                                onClick = { selectedRoute = "progress" },
+                                icon = { Text("📊") },
+                                label = { Text("进度") }
                             )
                             NavigationBarItem(
-                                icon = { Icon(Icons.Default.Settings, contentDescription = "设置") },
-                                label = { Text("设置") },
                                 selected = selectedRoute == "settings",
-                                onClick = { selectedRoute = "settings" }
+                                onClick = { selectedRoute = "settings" },
+                                icon = { Text("⚙️") },
+                                label = { Text("设置") }
                             )
                         }
                     }
