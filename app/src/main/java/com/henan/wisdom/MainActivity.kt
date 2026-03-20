@@ -8,10 +8,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.henan.wisdom.core.ui.theme.HenanWisdomTheme
+import com.henan.wisdom.core.ui.theme.SmarterHenanTheme
 import dagger.hilt.android.AndroidEntryPoint
 
 /**
@@ -24,7 +24,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         
         setContent {
-            HenanWisdomTheme {
+            SmarterHenanTheme {
                 var selectedRoute by remember { mutableStateOf("home") }
                 
                 Scaffold(
@@ -37,13 +37,13 @@ class MainActivity : ComponentActivity() {
                                 onClick = { selectedRoute = "home" }
                             )
                             NavigationBarItem(
-                                icon = { Icon(Icons.Default.School, contentDescription = "学习") },
+                                icon = { Icon(Icons.Default.MenuBook, contentDescription = "学习") },
                                 label = { Text("学习") },
                                 selected = selectedRoute == "study",
                                 onClick = { selectedRoute = "study" }
                             )
                             NavigationBarItem(
-                                icon = { Icon(Icons.Default.TrendingUp, contentDescription = "进度") },
+                                icon = { Icon(Icons.Default.BarChart, contentDescription = "进度") },
                                 label = { Text("进度") },
                                 selected = selectedRoute == "progress",
                                 onClick = { selectedRoute = "progress" }
