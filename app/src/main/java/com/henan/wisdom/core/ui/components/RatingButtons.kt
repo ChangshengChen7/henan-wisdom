@@ -1,6 +1,7 @@
 package com.henan.wisdom.core.ui.components
 
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -8,12 +9,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.SentimentDissatisfied
-import androidx.compose.material.icons.filled.SentimentNeutral
-import androidx.compose.material.icons.filled.SentimentSatisfied
-import androidx.compose.material.icons.filled.SentimentVeryDissatisfied
-import androidx.compose.material.icons.filled.SentimentVerySatisfied
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -21,21 +16,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.henan.wisdom.core.ui.theme.*
 
 /**
  * 评分等级
  */
-enum class RatingLevel(val value: Int, val label: String, val color: Color) {
-    VERY_HARD(1, "太难了", ErrorRed),
-    HARD(2, "有点难", WarningOrange),
-    NORMAL(3, "一般", InfoBlue),
-    EASY(4, "简单", PrimaryGreen),
-    VERY_EASY(5, "太简单了", SuccessGreen)
+enum class RatingLevel(val value: Int, val label: String, val color: Color, val emoji: String) {
+    VERY_HARD(1, "太难了", ErrorRed, "😫"),
+    HARD(2, "有点难", WarningOrange, "😕"),
+    NORMAL(3, "一般", InfoBlue, "😐"),
+    EASY(4, "简单", PrimaryGreen, "😊"),
+    VERY_EASY(5, "太简单了", SuccessGreen, "😄")
 }
 
 /**
@@ -45,9 +38,6 @@ typealias OnRatingSelected = (RatingLevel) -> Unit
 
 /**
  * 评分按钮组件
- * 使用 Jetpack Compose 动画 API 实现交互效果
- *
- * 官方文档：https://developer.android.com/jetpack/compose/animation
  */
 @Composable
 fun RatingButtons(
@@ -131,11 +121,6 @@ private fun RatingButton(
         label = "ratingBorder"
     )
 
-    val iconColor by animateColorAsState(
-        targetValue = if (isSelected) level.color else MaterialTheme.colorScheme.onSurfaceVariant,
-        label = "ratingIcon"
-    )
-
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.clickable(
@@ -157,11 +142,9 @@ private fun RatingButton(
                 ),
             contentAlignment = Alignment.Center
         ) {
-            Icon(
-                imageVector = level.icon,
-                contentDescription = level.label,
-                tint = iconColor,
-                modifier = Modifier.size(24.dp)
+            Text(
+                text = level.emoji,
+                style = MaterialTheme.typography.headlineSmall
             )
         }
         Spacer(modifier = Modifier.height(4.dp))
@@ -173,16 +156,6 @@ private fun RatingButton(
         )
     }
 }
-
-// 扩展 RatingLevel 添加 icon 属性
-private val RatingLevel.icon: ImageVector
-    get() = when (this) {
-        RatingLevel.VERY_HARD -> Icons.Default.SentimentVeryDissatisfied
-        RatingLevel.HARD -> Icons.Default.SentimentDissatisfied
-        RatingLevel.NORMAL -> Icons.Default.SentimentNeutral
-        RatingLevel.EASY -> Icons.Default.SentimentSatisfied
-        RatingLevel.VERY_EASY -> Icons.Default.SentimentVerySatisfied
-    }
 
 /**
  * 简化版评分按钮 - 仅三个选项
