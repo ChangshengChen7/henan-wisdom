@@ -48,7 +48,7 @@ interface CardDao {
     
     /**
      * 获取到期需要复习的卡片
-     * 用于间隔重复学习算法的取卡
+     * 用于FSRS算法的取卡
      */
     @Query("SELECT * FROM cards WHERE dueDate <= :now ORDER BY dueDate ASC")
     fun getDueCards(now: Long): Flow<List<CardEntity>>
@@ -72,6 +72,19 @@ interface CardDao {
     @Query("SELECT * FROM cards WHERE reps > 0 AND dueDate > :now ORDER BY dueDate ASC")
     fun getLearningCards(now: Long): Flow<List<CardEntity>>
     
+    /**
+     * 获取已掌握的卡片
+     * 稳定度 > 3.0 且复习次数 > 3
+     */
+    @Query("SELECT * FROM cards WHERE stability >= 3.0 AND reps > 3 ORDER BY updatedAt DESC")
+    fun getMasteredCards(): Flow<List<CardEntity>>
+    
+    /**
+     * 获取需要学习的卡片（新卡片 + 到期卡片）
+     */
+    @Query("SELECT * FROM cards WHERE (reps = 0 AND dueDate = 0) OR (dueDate <= :now AND dueDate > 0) ORDER BY dueDate ASC LIMIT :limit")
+    fun getStudyQueueCards(now: Long, limit: Int): Flow<List<CardEntity>>
+    
     // ==================== 统计查询 ====================
     
     @Query("SELECT COUNT(*) FROM cards")
@@ -85,4 +98,46 @@ interface CardDao {
     
     @Query("SELECT COUNT(*) FROM cards WHERE categoryId = :categoryId")
     fun getCardsCountByCategory(categoryId: String): Flow<Int>
+    
+    @Query("SELECT COUNT(*) FROM cards WHERE stability >= 3.0 AND reps > 3")
+    fun getMasteredCardsCount(): Flow<Int>
+    
+    @Query("SELECT COUNT(*) FROM cards WHERE reps > 0 AND dueDate > :now")
+    fun getLearningCardsCount(now: Long): Flow<Int>
+    
+    // ==================== 批量操作 ====================
+    
+    /**
+     * 批量更新卡片复习数据
+     */
+    @Query("UPDATE cards SET stability = :stability, difficulty = :difficulty, dueDate = :dueDate, reps = :reps, lapses = :lapses, updatedAt = :updatedAt WHERE id = :cardId")
+    suspend fun updateCardReview(
+        cardId: String,
+        stability: Float,
+        difficulty: Float,
+        dueDate: Long,
+        reps: Int,
+        lapses: Int,
+        updatedAt: Long = System.currentTimeMillis()
+    )
+    
+    /**
+     * 重置所有卡片的学习进度
+     */
+    @Query("UPDATE cards SET stability = 1.0, difficulty = 2.5, dueDate = 0, reps = 0, lapses = 0, updatedAt = :updatedAt")
+    suspend fun resetAllCards(updatedAt: Long = System.currentTimeMillis())
+    
+    // ==================== 搜索查询 ====================
+    
+    /**
+     * 搜索卡片（按标题或内容）
+     */
+    @Query("SELECT * FROM cards WHERE title LIKE '%' || :query || '%' OR content LIKE '%' || :query || '%' ORDER BY createdAt DESC")
+    fun searchCards(query: String): Flow<List<CardEntity>>
+    
+    /**
+     * 获取随机卡片（用于测验模式）
+     */
+    @Query("SELECT * FROM cards ORDER BY RANDOM() LIMIT :limit")
+    fun getRandomCards(limit: Int): Flow<List<CardEntity>>
 }
