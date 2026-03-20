@@ -37,13 +37,13 @@ class MainActivity : ComponentActivity() {
                                 onClick = { selectedRoute = "home" }
                             )
                             NavigationBarItem(
-                                icon = { Icon(Icons.Default.MenuBook, contentDescription = "学习") },
+                                icon = { Icon(Icons.Default.Book, contentDescription = "学习") },
                                 label = { Text("学习") },
                                 selected = selectedRoute == "study",
                                 onClick = { selectedRoute = "study" }
                             )
                             NavigationBarItem(
-                                icon = { Icon(Icons.Default.BarChart, contentDescription = "进度") },
+                                icon = { Icon(Icons.Default.ShowChart, contentDescription = "进度") },
                                 label = { Text("进度") },
                                 selected = selectedRoute == "progress",
                                 onClick = { selectedRoute = "progress" }
